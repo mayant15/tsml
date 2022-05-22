@@ -16,6 +16,19 @@
 // String -> " .* "
 // ValBinding -> val Identifier = Expr
 
+import moo from 'moo'
+import { logger } from './logger'
+
+const rules: moo.Rules = {
+  whitespace: /[ \t]+/,
+  number: /[0-9]+/,
+  string: /"(?:\\["\\]|[^\n"\\])*"/,
+  keyword: ['use', 'fun', 'val'],
+  newline: { match: /\n/, lineBreaks: true },
+}
+
+const lexer = moo.compile(rules)
+
 export enum ExprType {
   VAL_BINDING = 'val',
   INTEGER = 'int',
@@ -73,6 +86,15 @@ const parsers = {
 }
 
 export const parse = (raw: string): Expr => {
+  lexer.reset(raw)
+  for (const token of lexer) {
+    // Ignore whitespace
+    if (token.type === 'whitespace') {
+      continue
+    }
+
+    logger.debug(token)
+  }
   return {
     raw,
     ...parsers.integer('42'),
