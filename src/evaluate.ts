@@ -1,3 +1,4 @@
+import { logger } from './logger'
 import { Expr, ExprType } from './parse'
 import {
   createIntValue,
@@ -13,7 +14,7 @@ const getType = (expr: Expr) => {
   switch (expr.kind) {
     case ExprType.INTEGER:
       return ValueType.Int
-    case ExprType.INTEGER:
+    case ExprType.STRING:
       return ValueType.String
     case ExprType.VAL_BINDING:
       return ValueType.Unit
@@ -23,7 +24,7 @@ const getType = (expr: Expr) => {
 const typecheck = (expr: Expr, staticEnv: StaticEnvironment) => {
   switch (expr.kind) {
     case ExprType.INTEGER:
-    case ExprType.INTEGER:
+    case ExprType.STRING:
     case ExprType.VAL_BINDING:
       return true
   }
@@ -38,7 +39,14 @@ export const evaluate = (expr: Expr, runtime: Runtime): Value => {
         return createStringValue(expr.value)
       case ExprType.VAL_BINDING:
         // TODO: Should I mutate the runtime here?
-        runtime.env.dynamic[expr.identifier] = evaluate(expr.value, runtime)
+        const value = evaluate(expr.value, runtime)
+        runtime.env.static[expr.identifier] = value.kind
+        runtime.env.dynamic[expr.identifier] = value
+        logger.info(
+          `val ${expr.identifier} = ${
+            runtime.env.dynamic[expr.identifier].content
+          } : ${runtime.env.static[expr.identifier]}`
+        )
         return createUnitValue()
       default:
         return createUnitValue()
