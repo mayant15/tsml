@@ -1,9 +1,16 @@
-type SampleInterface = {
-  key: string
+import { drivers } from './io-driver'
+import { logger } from './logger'
+import repl from './repl'
+
+const greet = () => {
+  logger.info('Welcome to TSML!')
 }
 
-export const si: SampleInterface = {
-  key: '',
+async function main() {
+  greet()
+  await repl.run({
+    driver: drivers.stdin,
+  })
 }
 
-console.log(si)
+main()
