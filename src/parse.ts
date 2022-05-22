@@ -16,18 +16,9 @@
 // String -> " .* "
 // ValBinding -> val Identifier = Expr
 
-import moo from 'moo'
 import { logger } from './logger'
-
-const rules: moo.Rules = {
-  whitespace: /[ \t]+/,
-  number: /[0-9]+/,
-  string: /"(?:\\["\\]|[^\n"\\])*"/,
-  keyword: ['use', 'fun', 'val'],
-  newline: { match: /\n/, lineBreaks: true },
-}
-
-const lexer = moo.compile(rules)
+import { Parser, Grammar } from 'nearley'
+import grammar from './generated/grammar'
 
 export enum ExprType {
   VAL_BINDING = 'val',
@@ -86,15 +77,9 @@ const parsers = {
 }
 
 export const parse = (raw: string): Expr => {
-  lexer.reset(raw)
-  for (const token of lexer) {
-    // Ignore whitespace
-    if (token.type === 'whitespace') {
-      continue
-    }
-
-    logger.debug(token)
-  }
+  const parser = new Parser(Grammar.fromCompiled(grammar))
+  parser.feed(raw)
+  logger.debug(JSON.stringify(parser.results[0], null, 2))
   return {
     raw,
     ...parsers.integer('42'),
