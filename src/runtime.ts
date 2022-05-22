@@ -5,7 +5,7 @@ export enum ValueType {
   Function = 'function',
 }
 
-type ValueBase<Kind, JSType> = {
+type ValueBase<Kind extends ValueType, JSType> = {
   kind: Kind
   content: JSType
 }
@@ -30,3 +30,24 @@ export const createStringValue = (content: string): StringValue => ({
 })
 
 export type Value = UnitValue | IntValue | StringValue
+
+export type EnvElementId = string
+
+export type StaticEnvironment = Record<EnvElementId, ValueType>
+export type DynamicEnvironment = Record<EnvElementId, Value>
+
+export type Runtime = {
+  readonly env: {
+    static: StaticEnvironment
+    dynamic: DynamicEnvironment
+  }
+}
+
+export const createRuntime = (): Runtime => {
+  return {
+    env: {
+      static: {},
+      dynamic: {},
+    },
+  }
+}
