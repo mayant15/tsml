@@ -8,7 +8,7 @@ const lexer = moo.compile({
   integer: /[0-9]+/,
   string: /"(?:\\["\\]|[^\n"\\])*"/,
   word: {
-    match: /[a-z]+/,
+    match: /[a-zA-Z]+/,
     type: moo.keywords({
       kw: ["use", "val"]
     })
@@ -22,18 +22,41 @@ const lexer = moo.compile({
 
 @lexer lexer
 
-# TODO: Parentheses should create tuples
-expr -> exprContent | %lparen _ exprContent _ %rparen {% ([_lparen, _ws1, content, _ws2, _rparen]) => content %}
+program -> expr
 
-exprContent -> integer | string | valBinding
+expr -> integer | string | valBinding
 
-integer -> %integer
+# TODO: Some form of typing here?
+integer -> %integer {% ([value]) => {
+  return {
+    raw: value.text,
+    kind: "int",
+    value: parseInt(value.value)
+  }
+} %}
 
-string -> %string
+string -> %string {% ([{text, value}]) => {
+  return {
+    raw: text,
+    kind: "string",
+    value: value.slice(1, -1) // Remove the quotes
+  }
+} %}
 
 identifier -> %word
 
-valBinding -> "val" %ws identifier _ %eq _ expr
+# TODO: Make it so that I don't have to do this insane argument destructuring to make my AST
+valBinding -> "val" __ identifier _ %eq _ expr {% ([kw, _ws1, [{value: id}], _ws2, _eq, _ws3, [expr]]) => {
+  return {
+    raw: `val ${id} = ${expr.raw}`,
+    kind: "val",
+    identifier: id,
+    value: expr,
+  }
+} %}
 
 # Match optional whitespace
-_ -> %ws:*
+_ -> %ws:* {% () => null %}
+
+# Match required whitespace
+__ -> %ws:+ {% () => null %}

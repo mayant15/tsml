@@ -79,9 +79,7 @@ const parsers = {
 export const parse = (raw: string): Expr => {
   const parser = new Parser(Grammar.fromCompiled(grammar))
   parser.feed(raw)
-  logger.debug(JSON.stringify(parser.results[0], null, 2))
-  return {
-    raw,
-    ...parsers.integer('42'),
-  }
+
+  // TODO: Traverse the tree
+  return parser.results[0][0][0]
 }
