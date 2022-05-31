@@ -1,21 +1,3 @@
-// Syntax elements
-// 1. Integer -> (0-9)+
-//   eg. 1
-// 2. String -> " .* "
-//   eg. "hello"
-// 3. Identifier -> [a-ZA-Z]([a-zA-Z0-9])*
-//   eg. hello
-// 4. ValBinding -> val Identifier = Expr
-//   eg. val id = 2
-
-// Parsing
-// Start -> Expr
-// E -> Integer | String | ValBinding
-// Expr -> E | ( E )
-// Integer -> (0-9)+
-// String -> " .* "
-// ValBinding -> val Identifier = Expr
-
 import { Parser, Grammar } from 'nearley'
 import grammar from './generated/grammar'
 
