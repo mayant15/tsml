@@ -1,7 +1,6 @@
-import { drivers } from './io-driver'
-import { logger } from './logger'
-import repl from './repl'
-import { createRuntime } from './runtime'
+import { repl, drivers } from './repl'
+import { logger } from './utils/logger'
+import { createRuntime } from './tsml/runtime'
 
 const greet = () => {
   logger.info('Welcome to TSML!')

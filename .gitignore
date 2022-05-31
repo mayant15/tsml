@@ -1,13 +1,16 @@
 node_modules/
 lib/
 dist/
-src/generated/
+
+# Generated parser
+src/tsml/generated/
 
 *.log
 *.txt
 *.js
 *.d.ts
 
+# Jest
 coverage/
 !jest.config.js
 !babel.config.js

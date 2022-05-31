@@ -16,7 +16,6 @@
 // String -> " .* "
 // ValBinding -> val Identifier = Expr
 
-import { logger } from './logger'
 import { Parser, Grammar } from 'nearley'
 import grammar from './generated/grammar'
 
