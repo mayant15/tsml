@@ -9,7 +9,7 @@
     "build": "yarn grammar:compile && tsc",
     "start": "yarn build && node lib/src/index.js",
     "test": "jest",
-    "grammar:compile": "yarn nearleyc src/tsml/grammar.ne -o src/tsml/generated/grammar.ts"
+    "grammar:compile": "./scripts/build-grammar.sh"
   },
   "devDependencies": {
     "@babel/core": "^7.18.2",
