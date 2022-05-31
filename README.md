@@ -20,8 +20,8 @@ You can end the REPL Ctrl+D on Linux.
 
 ## Supported Features
 
-- [ ] Literal integers and strings
-- [ ] Variable bindings with `val` expressions
+- [x] Literal integers and strings
+- [x] Variable bindings with `val` expressions
 - [ ] Functions
 
 ## Why?
