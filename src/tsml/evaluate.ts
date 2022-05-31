@@ -1,5 +1,12 @@
 import { logger } from '../utils/logger'
-import { Expr, ExprType } from './parse'
+import {
+  Expr,
+  ExprType,
+  IdentifierExpr,
+  IntegerExpr,
+  StringExpr,
+  ValBindingExpr,
+} from './parse'
 import {
   createIntValue,
   createStringValue,
@@ -7,7 +14,6 @@ import {
   Runtime,
   StaticEnvironment,
   Value,
-  ValueType,
 } from './runtime'
 
 const typecheck = (expr: Expr, staticEnv: StaticEnvironment) => {
@@ -23,28 +29,83 @@ const typecheck = (expr: Expr, staticEnv: StaticEnvironment) => {
   }
 }
 
-export const evaluate = (expr: Expr, runtime: Runtime): Value => {
+export type EvaluationResult = {
+  value: Value
+  runtime: Runtime
+}
+
+const evaluateIntegerExpr = (
+  expr: IntegerExpr,
+  runtime: Runtime
+): EvaluationResult => ({
+  runtime,
+  value: createIntValue(expr.value),
+})
+
+const evaluateStringExpr = (
+  expr: StringExpr,
+  runtime: Runtime
+): EvaluationResult => ({
+  runtime,
+  value: createStringValue(expr.value),
+})
+
+const evaluateValBinding = (
+  expr: ValBindingExpr,
+  runtime: Runtime
+): EvaluationResult => {
+  // TODO: Ignore the runtime here? Handle this when we do scopes (let bindings)
+  const { value } = evaluate(expr.value, runtime)
+
+  const newRuntime: Runtime = {
+    env: {
+      dynamic: {
+        ...runtime.env.dynamic,
+        [expr.identifier]: value,
+      },
+      static: {
+        ...runtime.env.static,
+        [expr.identifier]: value.kind,
+      },
+    },
+  }
+
+  logger.info(
+    `val ${expr.identifier} = ${
+      newRuntime.env.dynamic[expr.identifier].content
+    } : ${newRuntime.env.static[expr.identifier]}`
+  )
+
+  return {
+    runtime: newRuntime,
+    value: createUnitValue(),
+  }
+}
+
+const evaluateIdentifierExpr = (
+  expr: IdentifierExpr,
+  runtime: Runtime
+): EvaluationResult => ({
+  runtime,
+  value: runtime.env.dynamic[expr.value],
+})
+
+export const evaluate = (expr: Expr, runtime: Runtime): EvaluationResult => {
   if (typecheck(expr, runtime.env.static)) {
     switch (expr.kind) {
       case ExprType.INTEGER:
-        return createIntValue(expr.value)
+        return evaluateIntegerExpr(expr, runtime)
       case ExprType.STRING:
-        return createStringValue(expr.value)
+        return evaluateStringExpr(expr, runtime)
       case ExprType.VAL_BINDING:
-        // TODO: Should I mutate the runtime here?
-        const value = evaluate(expr.value, runtime)
-        runtime.env.static[expr.identifier] = value.kind
-        runtime.env.dynamic[expr.identifier] = value
-        logger.info(
-          `val ${expr.identifier} = ${
-            runtime.env.dynamic[expr.identifier].content
-          } : ${runtime.env.static[expr.identifier]}`
-        )
-        return createUnitValue()
+        return evaluateValBinding(expr, runtime)
       case ExprType.IDENTIFIER:
-        return runtime.env.dynamic[expr.value]
+        return evaluateIdentifierExpr(expr, runtime)
       default:
-        return createUnitValue()
+        return {
+          runtime,
+          value: createUnitValue(),
+        }
     }
   } else {
     throw TypeError(`Typecheck failed for expression: ${expr.raw}`)

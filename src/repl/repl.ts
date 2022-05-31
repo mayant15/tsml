@@ -14,11 +14,16 @@ const prompt = () => {
 
 const run = async ({ driver, runtime }: REPLConfig) => {
   const shouldClose = false
+  let currentRuntime = runtime
   while (!shouldClose) {
     prompt()
     const next = await driver.getNextStatement()
-    const { kind, content } = parseAndEvaluate(runtime, next)
+    const {
+      runtime: newRuntime,
+      value: { content, kind },
+    } = parseAndEvaluate(currentRuntime, next)
     logger.info(`${content} : ${kind}`)
+    currentRuntime = newRuntime
   }
 }
 
