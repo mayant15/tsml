@@ -7,3 +7,7 @@ src/generated/
 *.txt
 *.js
 *.d.ts
+
+coverage/
+!jest.config.js
+!babel.config.js
