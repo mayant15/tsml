@@ -17,8 +17,8 @@ const run = async ({ driver, runtime }: REPLConfig) => {
   while (!shouldClose) {
     prompt()
     const next = await driver.getNextStatement()
-    const result = parseAndEvaluate(runtime, next)
-    logger.info(result)
+    const { kind, content } = parseAndEvaluate(runtime, next)
+    logger.info(`${content} : ${kind}`)
   }
 }
 

@@ -10,23 +10,16 @@ import {
   ValueType,
 } from './runtime'
 
-const getType = (expr: Expr) => {
-  switch (expr.kind) {
-    case ExprType.INTEGER:
-      return ValueType.Int
-    case ExprType.STRING:
-      return ValueType.String
-    case ExprType.VAL_BINDING:
-      return ValueType.Unit
-  }
-}
-
 const typecheck = (expr: Expr, staticEnv: StaticEnvironment) => {
   switch (expr.kind) {
+    // Primitives that don't need to type check
     case ExprType.INTEGER:
     case ExprType.STRING:
     case ExprType.VAL_BINDING:
       return true
+    case ExprType.IDENTIFIER:
+      // This value has been declared and has a type
+      return expr.value in staticEnv
   }
 }
 
@@ -48,6 +41,8 @@ export const evaluate = (expr: Expr, runtime: Runtime): Value => {
           } : ${runtime.env.static[expr.identifier]}`
         )
         return createUnitValue()
+      case ExprType.IDENTIFIER:
+        return runtime.env.dynamic[expr.value]
       default:
         return createUnitValue()
     }

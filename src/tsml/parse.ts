@@ -23,6 +23,7 @@ export enum ExprType {
   VAL_BINDING = 'val',
   INTEGER = 'int',
   STRING = 'string',
+  IDENTIFIER = 'identifier',
 }
 
 export type IntegerExpr = {
@@ -47,6 +48,16 @@ export const createStringExpr = (value: string): StringExpr => ({
 
 export type Identifier = string
 
+export type IdentifierExpr = {
+  kind: ExprType.IDENTIFIER
+  value: Identifier
+}
+
+export const createIdentifierExpr = (value: Identifier): IdentifierExpr => ({
+  kind: ExprType.IDENTIFIER,
+  value,
+})
+
 export type ValBindingExpr = {
   kind: ExprType.VAL_BINDING
   identifier: Identifier
@@ -62,17 +73,13 @@ export const createValBindingExpr = (
   value,
 })
 
-export type Expr = (IntegerExpr | StringExpr | ValBindingExpr) & {
+export type Expr = (
+  | IdentifierExpr
+  | IntegerExpr
+  | StringExpr
+  | ValBindingExpr
+) & {
   raw: string
-}
-
-const parsers = {
-  integer: (input: string): IntegerExpr => {
-    return createIntegerExpr(42)
-  },
-  string: (input: string): StringExpr => {
-    return createStringExpr('')
-  },
 }
 
 export const parse = (raw: string): Expr => {

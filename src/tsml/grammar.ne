@@ -24,7 +24,7 @@ const lexer = moo.compile({
 
 program -> expr
 
-expr -> integer | string | valBinding
+expr -> identifier | integer | string | valBinding
 
 # TODO: Some form of typing here?
 integer -> %integer {% ([value]) => {
@@ -43,10 +43,16 @@ string -> %string {% ([{text, value}]) => {
   }
 } %}
 
-identifier -> %word
+identifier -> %word {% ([{value}]) => {
+  return {
+    raw: value,
+    kind: "identifier",
+    value,
+  }
+} %}
 
 # TODO: Make it so that I don't have to do this insane argument destructuring to make my AST
-valBinding -> "val" __ identifier _ %eq _ expr {% ([kw, _ws1, [{value: id}], _ws2, _eq, _ws3, [expr]]) => {
+valBinding -> "val" __ identifier _ %eq _ expr {% ([kw, _ws1, {value: id}, _ws2, _eq, _ws3, [expr]]) => {
   return {
     raw: `val ${id} = ${expr.raw}`,
     kind: "val",
