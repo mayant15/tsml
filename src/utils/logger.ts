@@ -7,7 +7,7 @@ enum LogLevel {
   DEBUG,
 }
 
-const logLevel = LogLevel.DEBUG
+const logLevel = process.env['TSML_LOG_LEVEL'] ?? LogLevel.DEBUG
 
 export const logger = {
   debug: logLevel >= LogLevel.DEBUG ? console.log : noop,

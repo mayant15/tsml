@@ -8,7 +8,7 @@
   "scripts": {
     "build": "yarn grammar:compile && tsc",
     "start": "yarn build && node lib/src/index.js",
-    "test": "jest",
+    "test": "TSML_LOG_LEVEL=0 jest",
     "grammar:compile": "./scripts/build-grammar.sh"
   },
   "devDependencies": {
