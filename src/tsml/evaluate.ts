@@ -12,11 +12,11 @@ import {
   createStringValue,
   createUnitValue,
   Runtime,
-  StaticEnvironment,
+  Environment,
   Value,
 } from './runtime'
 
-const typecheck = (expr: Expr, staticEnv: StaticEnvironment) => {
+const typecheck = (expr: Expr, staticEnv: Environment) => {
   switch (expr.kind) {
     // Primitives that don't need to type check
     case ExprType.INTEGER:
@@ -59,22 +59,15 @@ const evaluateValBinding = (
 
   const newRuntime: Runtime = {
     env: {
-      dynamic: {
-        ...runtime.env.dynamic,
-        [expr.identifier]: value,
-      },
-      static: {
-        ...runtime.env.static,
-        [expr.identifier]: value.kind,
-      },
+      ...runtime.env,
+      [expr.identifier]: value,
     },
   }
 
-  logger.info(
-    `val ${expr.identifier} = ${
-      newRuntime.env.dynamic[expr.identifier].content
-    } : ${newRuntime.env.static[expr.identifier]}`
-  )
+  // Log this but deliberately picking from the environment and not
+  //  `value`, just to make sure that the new environment is correct
+  const { content, kind } = newRuntime.env[expr.identifier]
+  logger.info(`val ${expr.identifier} = ${content} : ${kind}`)
 
   return {
     runtime: newRuntime,
@@ -87,11 +80,11 @@ const evaluateIdentifierExpr = (
   runtime: Runtime
 ): EvaluationResult => ({
   runtime,
-  value: runtime.env.dynamic[expr.value],
+  value: runtime.env[expr.value],
 })
 
 export const evaluate = (expr: Expr, runtime: Runtime): EvaluationResult => {
-  if (typecheck(expr, runtime.env.static)) {
+  if (typecheck(expr, runtime.env)) {
     switch (expr.kind) {
       case ExprType.INTEGER:
         return evaluateIntegerExpr(expr, runtime)

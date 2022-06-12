@@ -33,22 +33,14 @@ export type Value = UnitValue | IntValue | StringValue
 
 export type EnvElementId = string
 
-export type StaticEnvironment = Record<EnvElementId, ValueType>
-export type DynamicEnvironment = Record<EnvElementId, Value>
+export type Environment = Record<EnvElementId, Value>
 
 export type Runtime = {
-  // TODO: Do I need both separately if Value also contains kind?
-  readonly env: {
-    static: StaticEnvironment
-    dynamic: DynamicEnvironment
-  }
+  readonly env: Environment
 }
 
 export const createRuntime = (): Runtime => {
   return {
-    env: {
-      static: {},
-      dynamic: {},
-    },
+    env: {},
   }
 }
