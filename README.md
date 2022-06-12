@@ -1,5 +1,8 @@
 # TSML
 
+![checks](https://img.shields.io/github/checks-status/mayant15/tsml/main)
+[![codecov](https://codecov.io/gh/mayant15/tsml/branch/main/graph/badge.svg?token=L2NASHZHZK)](https://codecov.io/gh/mayant15/tsml)
+
 A bare-bones REPL for a subset of StandardML written in TypeScript.
 
 ## Using
